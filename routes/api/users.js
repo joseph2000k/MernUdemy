@@ -4,7 +4,7 @@ const gravatar= require('gravatar');
 const bcrypt= require('bcryptjs');
 const jwt= require('jsonwebtoken');
 const config = require('config');
-const { body, validationResult } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 
 const User = require('../../models/User')
 
@@ -12,9 +12,9 @@ const User = require('../../models/User')
 //@desc     Register route
 //@access   Public
 router.post('/', [
-    body('name', 'Name is required').not().isEmpty(),
-    body('email', 'Please includeb a valid email').isEmail(),
-    body('password', 'Please enter a password with 6 or more characters').isLength({min:6})
+    check('name', 'Name is required').not().isEmpty(),
+    check('email', 'Please includeb a valid email').isEmail(),
+    check('password', 'Please enter a password with 6 or more characters').isLength({min:6})
 ], async (req, res)=> {
     
     const errors = validationResult(req);
