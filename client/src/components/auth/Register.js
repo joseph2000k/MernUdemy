@@ -1,7 +1,10 @@
 import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { setAlert } from "../../actions/alert";
+import propTypes from "prop-types";
 
-export const Register = () => {
+export const Register = ({ setAlert }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,7 +20,7 @@ export const Register = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     if (password !== password2) {
-      console.log("Passwords do not match");
+      setAlert("Passwords do not match", "danger");
     } else {
       console.log("SUCCESS");
     }
@@ -83,4 +86,9 @@ export const Register = () => {
   );
 };
 
-export default Register;
+//With PropTypes.element you can specify that only a single child can be passed to a component as children.
+Register.propTypes = {
+  setAlert: propTypes.func.isRequired,
+};
+
+export default connect(null, { setAlert })(Register);
