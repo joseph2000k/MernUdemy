@@ -18,6 +18,7 @@ if (localStorage.token) {
 }
 
 const App = () => {
+  //useEffect is like componentDidMount life cycle
   useEffect(() => {
     store.dispatch(loadUser());
   }, []);
