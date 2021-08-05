@@ -39,7 +39,7 @@ export const createProfile =
       dispatch(
         setAlert(edit ? "Profile Updated" : "Profile Created", "success")
       );
-
+      //Read https://reactrouter.com/web/api/history about push and withRouter
       if (!edit) {
         history.push("/dashboard");
       }

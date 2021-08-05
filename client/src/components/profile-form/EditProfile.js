@@ -1,10 +1,15 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { createProfile } from "../../actions/profile";
+import { createProfile, getCurrentProfile } from "../../actions/profile";
 
-const CreateProfile = ({ createProfile, history }) => {
+const EditProfile = ({
+  profile: { profile, loading },
+  createProfile,
+  getCurrentProfile,
+  history,
+}) => {
   const [formData, setFormData] = useState({
     company: "",
     website: "",
@@ -21,6 +26,26 @@ const CreateProfile = ({ createProfile, history }) => {
   });
 
   const [displaySocialInputs, toggleSocialInputs] = useState(false);
+
+  useEffect(() => {
+    getCurrentProfile();
+
+    setFormData({
+      company: loading || !profile.company ? "" : profile.company,
+      website: loading || !profile.website ? "" : profile.website,
+      location: loading || !profile.location ? "" : profile.location,
+      bio: loading || !profile.bio ? "" : profile.bio,
+      status: loading || !profile.status ? "" : profile.status,
+      githubusername:
+        loading || !profile.githubusername ? "" : profile.githubusername,
+      skills: loading || !profile.skills ? "" : profile.skills,
+      youtube: loading || !profile.social ? "" : profile.youtube,
+      facebook: loading || !profile.social ? "" : profile.facebook,
+      twitter: loading || !profile.social ? "" : profile.twitter,
+      instagram: loading || !profile.social ? "" : profile.instagram,
+      linkedin: loading || !profile.social ? "" : profile.linkedin,
+    });
+  }, [loading]);
 
   const {
     company,
@@ -220,9 +245,17 @@ const CreateProfile = ({ createProfile, history }) => {
   );
 };
 
-CreateProfile.propTypes = {
+EditProfile.propTypes = {
   createProfile: PropTypes.func.isRequired,
+  profile: PropTypes.object.isRequired,
+  getCurrentProfile: PropTypes.func.isRequired,
 };
 
+const mapStateToProps = (state) => ({
+  profile: state.profile,
+});
+
 //You can get access to the history object’s properties and the closest <Route>'s match via the withRouter higher-order component. withRouter will pass updated match, location, and history props to the wrapped component whenever it renders.
-export default connect(null, { createProfile })(withRouter(CreateProfile));
+export default connect(mapStateToProps, { createProfile, getCurrentProfile })(
+  withRouter(EditProfile)
+);
