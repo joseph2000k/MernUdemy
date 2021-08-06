@@ -10,22 +10,27 @@ import { loadUser } from "./actions/auth";
 import setAuthToken from "./utils/setAuthToken";
 import Dashboard from "./components/dashboard/Dashboard";
 import PrivateRoute from "./components/routing/PrivateRoute";
-import CreateProfile from "./components/profile-form/CreateProfile";
+import ProfileForm from "./components/profile-form/ProfileForm";
+import { LOGOUT } from "./actions/types";
 
 // Redux
 import { Provider } from "react-redux";
 import store from "./store";
 
-if (localStorage.token) {
-  setAuthToken(localStorage.token);
-}
-
 const App = () => {
   //useEffect is like componentDidMount life cycle
   useEffect(() => {
+    // check for token in LS
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+    }
     store.dispatch(loadUser());
-  }, []);
 
+    // log user out from all tabs if they log out in one tab
+    window.addEventListener("storage", () => {
+      if (!localStorage.token) store.dispatch({ type: LOGOUT });
+    });
+  }, []);
   return (
     <Provider store={store}>
       <Router>
@@ -41,7 +46,12 @@ const App = () => {
               <PrivateRoute
                 exact
                 path="/create-profile"
-                component={CreateProfile}
+                component={ProfileForm}
+              />
+              <PrivateRoute
+                exact
+                path="/edit-profile"
+                component={ProfileForm}
               />
             </Switch>
           </section>

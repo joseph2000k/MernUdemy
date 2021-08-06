@@ -1,51 +1,51 @@
 import React, { useState, Fragment, useEffect } from "react";
-import { Link, withRouter } from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { createProfile, getCurrentProfile } from "../../actions/profile";
 
-const EditProfile = ({
+const initialState = {
+  company: "",
+  website: "",
+  location: "",
+  bio: "",
+  status: "",
+  githubusername: "",
+  skills: "",
+  youtube: "",
+  facebook: "",
+  twitter: "",
+  instagram: "",
+  linkedin: "",
+};
+
+const ProfileForm = ({
   profile: { profile, loading },
   createProfile,
   getCurrentProfile,
   history,
 }) => {
-  const [formData, setFormData] = useState({
-    company: "",
-    website: "",
-    location: "",
-    bio: "",
-    status: "",
-    githubusername: "",
-    skills: "",
-    youtube: "",
-    facebook: "",
-    twitter: "",
-    instagram: "",
-    linkedin: "",
-  });
+  const [formData, setFormData] = useState(initialState);
+
+  const creatingProfile = useRouteMatch("/create-profile");
 
   const [displaySocialInputs, toggleSocialInputs] = useState(false);
 
   useEffect(() => {
-    getCurrentProfile();
-
-    setFormData({
-      company: loading || !profile.company ? "" : profile.company,
-      website: loading || !profile.website ? "" : profile.website,
-      location: loading || !profile.location ? "" : profile.location,
-      bio: loading || !profile.bio ? "" : profile.bio,
-      status: loading || !profile.status ? "" : profile.status,
-      githubusername:
-        loading || !profile.githubusername ? "" : profile.githubusername,
-      skills: loading || !profile.skills ? "" : profile.skills,
-      youtube: loading || !profile.social ? "" : profile.youtube,
-      facebook: loading || !profile.social ? "" : profile.facebook,
-      twitter: loading || !profile.social ? "" : profile.twitter,
-      instagram: loading || !profile.social ? "" : profile.instagram,
-      linkedin: loading || !profile.social ? "" : profile.linkedin,
-    });
-  }, [loading]);
+    if (!profile) getCurrentProfile();
+    if (!loading && profile) {
+      const profileData = { ...initialState };
+      for (const key in profile) {
+        if (key in profileData) profileData[key] = profile[key];
+      }
+      for (const key in profile.social) {
+        if (key in profileData) profileData[key] = profile.social[key];
+      }
+      if (Array.isArray(profileData.skills))
+        profileData.skills = profileData.skills.join(", ");
+      setFormData(profileData);
+    }
+  }, [loading, getCurrentProfile, profile]);
 
   const {
     company,
@@ -72,10 +72,14 @@ const EditProfile = ({
 
   return (
     <Fragment>
-      <h1 className="large text-primary">Create Your Profile</h1>
+      <h1 className="large text-primary">
+        {creatingProfile ? "Create Your Profile" : "Edit Your Profile"}
+      </h1>
       <p className="lead">
-        <i className="fas fa-user"></i> Let's get some information to make your
-        profile stand out
+        <i className="fas fa-user" />{" "}
+        {creatingProfile
+          ? `Let's get some information to make your`
+          : "Add some changes to your profile"}
       </p>
       <small>* = required field</small>
       <form className="form" onSubmit={(e) => onSubmit(e)}>
@@ -245,7 +249,7 @@ const EditProfile = ({
   );
 };
 
-EditProfile.propTypes = {
+ProfileForm.propTypes = {
   createProfile: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
@@ -257,5 +261,5 @@ const mapStateToProps = (state) => ({
 
 //You can get access to the history object’s properties and the closest <Route>'s match via the withRouter higher-order component. withRouter will pass updated match, location, and history props to the wrapped component whenever it renders.
 export default connect(mapStateToProps, { createProfile, getCurrentProfile })(
-  withRouter(EditProfile)
+  ProfileForm
 );
