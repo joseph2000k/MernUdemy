@@ -1,12 +1,12 @@
-import axios from "axios";
-import { setAlert } from "./alert";
+import axios from 'axios';
+import { setAlert } from './alert';
 
-import { GET_PROFILE, PROFILE_ERROR } from "./types";
+import { GET_PROFILE, PROFILE_ERROR } from './types';
 
 //Get current users profiles
 export const getCurrentProfile = () => async (dispatch) => {
   try {
-    const res = await axios.get("/api/profile/me");
+    const res = await axios.get('/api/profile/me');
 
     dispatch({
       type: GET_PROFILE,
@@ -26,10 +26,10 @@ export const createProfile =
   async (dispatch) => {
     try {
       const config = {
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       };
 
-      const res = await axios.post("/api/profile", FormData, config);
+      const res = await axios.post('/api/profile', FormData, config);
 
       dispatch({
         type: GET_PROFILE,
@@ -37,17 +37,17 @@ export const createProfile =
       });
 
       dispatch(
-        setAlert(edit ? "Profile Updated" : "Profile Created", "success")
+        setAlert(edit ? 'Profile Updated' : 'Profile Created', 'success')
       );
       //Read https://reactrouter.com/web/api/history about push and withRouter
       if (!edit) {
-        history.push("/dashboard");
+        history.push('/dashboard');
       }
     } catch (err) {
       const errors = err.response.data.errors;
 
       if (errors) {
-        errors.forEach((error) => dispatch(setAlert(error.msg, "danger")));
+        errors.forEach((error) => dispatch(setAlert(error.msg, 'danger')));
       }
 
       dispatch({
