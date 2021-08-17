@@ -5,7 +5,7 @@ import {
   UPDATE_PROFILE,
   GET_PROFILES,
   GET_REPOS,
-} from '../actions/types';
+} from "../actions/types";
 
 const initialState = {
   profile: null,
@@ -37,6 +37,7 @@ export default function profileReducer(state = initialState, action) {
         ...state,
         error: payload,
         loading: false,
+        profile: null,
       };
     case CLEAR_PROFILE:
       return {
