@@ -6,6 +6,8 @@ const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 const Post = require("../../models/Post");
 
+const checkObjectId = require("../../middleware/checkObjectId");
+
 //@route    POST api/posts
 //@desc     Create a post
 //@access   Private
@@ -109,6 +111,30 @@ router.put("/like/:id", auth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
 
+    // Check if the post has already been liked
+    if (post.likes.some((like) => like.user.toString() === req.user.id)) {
+      return res.status(400).json({ msg: "Post already liked" });
+    }
+
+    post.likes.unshift({ user: req.user.id });
+
+    await post.save();
+
+    return res.json(post.likes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+//@route    GET api/posts/:id
+//@desc     Get post by ID
+//@access   Private
+
+router.put("/like/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
     // check if user already click like
     if (
       post.likes.filter((like) => like.user.toString() === req.user.id).length >
@@ -123,28 +149,6 @@ router.put("/like/:id", auth, async (req, res) => {
     res.json(post.likes);
   } catch (err) {
     console.err(err.message);
-    res.status(500).send("Server Error");
-  }
-});
-
-//@route    GET api/posts/:id
-//@desc     Get post by ID
-//@access   Private
-
-router.get("/:id", auth, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-
-    if (!post) {
-      return res.status(404).send({ msg: "Post not found" });
-    }
-
-    res.json(post);
-  } catch (err) {
-    console.error(err.message);
-    if (err.kind === "ObjectId") {
-      return res.status(404).send({ msg: "Post not found" });
-    }
     res.status(500).send("Server Error");
   }
 });
